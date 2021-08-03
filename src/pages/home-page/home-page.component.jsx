@@ -1,113 +1,68 @@
-import React, {Component} from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { retrieveInfoByCallsign } from '../api/fcc.js'
 
-const Message = (props) => <div className="message">{props.children}</div>
+export default function HomePage() {
+  
+  const [sender, setSender] = useState(null);
+  const [input, setInput] = useState('')
+  const [senderCallsign, setSenderCallsign] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null);
+  const handleChange = (e) => {
+    console.log(e.target.name);
+    console.log(e.target.value);
+    if (
+      /^[a-zA-Z0-9]{4,6}$/.test(
+          e.target.value
+      )
+    ) {
+        setErrorMessage('');
+    }
+    else {
+      setErrorMessage('Invalid callsign');
+    }
+    setInput(e.target.value);
+  };
+  const handleSubmit = (e) => {
+      e.preventDefault();
+      setSenderCallsign(input);
+  };
+  const [loaded, setLoaded] = useState(false);
 
-function SayHello({firstName, lastName}) {
-  return (
+  useEffect(() => {
+    retrieveInfoByCallsign(senderCallsign)
+      .then((response)=>{
+        setSender(response.data)
+        setLoaded(true);
+      });
+      console.log(sender)
+		}, [senderCallsign]);
+
+  return  (
     <div>
-      Hello {firstName} {lastName} !
-    </div>
-  )
-}
-
-SayHello.propTypes = {
-  firstName: PropTypes.string.isRequired,
-  lastName: PropTypes.string,
-}
-
-
-function StockProfile(props) {
-
-  const stockTicker = props.stockTicker;
-  const companyProfileInfo = props.companyProfileInfo;
-  return (
+      {loaded ?
       <div>
-          <div>Profile of: {stockTicker}</div>
-          <hr />
-          <div>
-              {
-                  Object.keys(companyProfileInfo)
-                      .map((info, index) => {
-                          return <div key={index}>{info} : {companyProfileInfo[info]}</div>
-                      })
-              }
-          </div>
+        {sender.name}
+        {sender.address.line1}
       </div>
+      : null}
+      <div className='App'>
+        <form onSubmit={handleSubmit}>
+            <label htmlFor='callsign'>
+                Call Sign:
+            </label>
+            <input
+                name='callsign'
+                value={input}
+                onChange={handleChange}
+                pattern='[a-zA-Z0-9]{4,6}'
+            />
+            <div className='error-message'>
+                {errorMessage}
+            </div>
+            <input type='submit' />
+        </form>
+      </div>
+    </div>
   );
 }
-
-function FBStockProfile() {
-  const stockTicker = 'ABC';
-  const companyProfileInfo = {
-      'Company Name': 'Facebook',
-      'Price': 150,
-      'Exchange': "Nasdaq Global Select",
-      'Industry': "Computer Software",
-      'CEO': 'Mark Zuckerberg'
-  }
-
-  return (
-      <StockProfile stockTicker={stockTicker} companyProfileInfo={companyProfileInfo}/>
-  )
-}
-
-class HamProfile extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      hamProfileInfo: {}
-    }
-  }
-
-  componentDidMount() {
-    retrieveInfoByCallsign(this.props.callsign)
-    .then(data => {
-      this.setState({
-        hamProfileInfo: data
-      })
-    })
-  }
-
-  render() {
-    const callsign = this.props.callsign;
-    const hamProfileInfo = this.state.hamProfileInfo;
-
-    return (
-      <div>
-        <div>Profile of: {callsign}</div>
-        <hr />
-            <div>
-            {hamProfileInfo.status}
-            <br/>
-            {hamProfileInfo.type}
-            <br/>
-            {hamProfileInfo.name}
-            </div>
-        </div>
-    );
-  }
-}
-
-const Usage = (props) => {
-  return <HamProfile callsign={'KI5KYE'} />
-}
-
-export default Usage;
-// export const HomePageComponent = () => {
-
-//   return (
-//     <div>
-//       <Message children="ahoy"/>
-//       <SayHello firstName="matt"/>
-//       <GetInfo callsign="KI5KYE"/>
-//       <FBStockProfile />
-//     </div>
-    
-//   );
-// }
-
-// export default HomePageComponent;
