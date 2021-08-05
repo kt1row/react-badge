@@ -2,65 +2,100 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { retrieveInfoByCallsign } from '../api/fcc.js'
 
+const initialInputs = {
+  senderCallsign: '',
+  receiverCallsign: '',
+};
+
 export default function HomePage() {
+  const [inputs, setInputs] = useState(initialInputs);
+  const [sender, setSender] = useState({});
+  const [isSenderLegit, setIsSenderLegit] = useState(false);
+  const [senderLoaded, setSenderLoaded] = useState(false);
+  const [receiver, setReceiver] = useState({});
+  const [isReceiverLegit, setIsReceiverLegit] = useState(false);
+  const [receiverLoaded, setReceiverLoaded] = useState(false);
   
-  const [sender, setSender] = useState(null);
-  const [input, setInput] = useState('')
-  const [senderCallsign, setSenderCallsign] = useState('')
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
+  
   const handleChange = (e) => {
-    console.log(e.target.name);
-    console.log(e.target.value);
-    if (
-      /^[a-zA-Z0-9]{4,6}$/.test(
-          e.target.value
-      )
-    ) {
-        setErrorMessage('');
-    }
-    else {
-      setErrorMessage('Invalid callsign');
-    }
-    setInput(e.target.value);
+    const { name, value } = e.target;
+    setInputs({
+      ...inputs,
+      [name]: value,
+    })
   };
+
   const handleSubmit = (e) => {
-      e.preventDefault();
-      setSenderCallsign(input);
+    if(sender.status !== 'INVALID') {
+      setIsSenderLegit(true);
+    }
+    else{
+      setIsSenderLegit(false);
+    }
+    if(receiver.status !== 'INVALID') {
+      setIsReceiverLegit(true);
+    }
+    else{
+      setIsReceiverLegit(false);
+    }
+    e.preventDefault();
+    setSubmitted(true);
   };
-  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    retrieveInfoByCallsign(senderCallsign)
+    setSubmitted(false);
+    retrieveInfoByCallsign(inputs.senderCallsign)
       .then((response)=>{
         setSender(response.data)
-        setLoaded(true);
-      });
-      console.log(sender)
-		}, [senderCallsign]);
+        setSenderLoaded(true);
+      })
+    retrieveInfoByCallsign(inputs.receiverCallsign)
+      .then((response)=>{
+        setReceiver(response.data)
+        setReceiverLoaded(true);
+      })
+		}, [inputs.senderCallsign, inputs.receiverCallsign]);
 
   return  (
     <div>
-      {loaded ?
+      {(senderLoaded && receiverLoaded && submitted) ?
       <div>
-        {sender.name}
-        {sender.address.line1}
+        {isSenderLegit ?
+        <div>
+          {sender.name}
+          {sender.address.line1}
+        </div> : 'Not legitimate sender callsign'
+        }
+        {isReceiverLegit ?
+        <div>
+          {receiver.name}
+          {receiver.address.line1}
+        </div> : 'Not legitimate receiver callsign'
+        }
       </div>
       : null}
       <div className='App'>
         <form onSubmit={handleSubmit}>
-            <label htmlFor='callsign'>
-                Call Sign:
-            </label>
-            <input
-                name='callsign'
-                value={input}
-                onChange={handleChange}
-                pattern='[a-zA-Z0-9]{4,6}'
-            />
-            <div className='error-message'>
-                {errorMessage}
-            </div>
-            <input type='submit' />
+          <label htmlFor='senderCallsign'>
+            Your Callsign:
+          </label>
+          <input
+            name='senderCallsign'
+            value={inputs.senderCallsign}
+            onChange={handleChange}
+            pattern='[a-zA-Z0-9]{4,6}'
+          />
+          <label htmlFor='receiverCallsign'>
+            Their Callsign:
+          </label>
+          <input
+            name='receiverCallsign'
+            value={inputs.receiverCallsign}
+            onChange={handleChange}
+            pattern='[a-zA-Z0-9]{4,6}'
+          />
+          <input type='submit' />
         </form>
       </div>
     </div>
