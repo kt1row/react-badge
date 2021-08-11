@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { retrieveInfoByCallsign } from '../api/fcc.js'
-import styles from '../../styles/QSLInput.module.scss';
+import {BrowserRouter as Router, Route, Link} from "react-router-dom";
+import { retrieveInfoByCallsign } from './api/fcc.js';
+import styles from '../styles/QSLForm.module.scss';
 
 const initialInputs = {
   senderCallsign: '',
@@ -12,7 +12,7 @@ const initialInputs = {
   rst: '',
 };
 
-export default function HomePage() {
+export default function QSLForm() {
   const [inputs, setInputs] = useState(initialInputs);
 
   const [sender, setSender] = useState({});
@@ -151,7 +151,7 @@ export default function HomePage() {
           <div>Frequency: {inputs.frequency} MHz</div>
           <div>Mode: {inputs.mode}</div>
           <div>RS(T): {inputs.rst}</div>
-          <a href='/QSLCard'>Click here to generate QSL card!</a>
+          <a href="url">Click here to generate a QSL card!</a>
         </div> : null
         }
         <div className={styles.error}>
