@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {BrowserRouter as Router, Route, Link} from "react-router-dom";
 import { retrieveInfoByCallsign } from './api/fcc.js';
+import PropTypes from 'prop-types';
 import styles from '../styles/QSLForm.module.scss';
 
 const initialInputs = {
@@ -25,6 +26,7 @@ export default function QSLForm() {
   
   const [submitted, setSubmitted] = useState(false);
   
+  // set inputs when form values change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setInputs({
@@ -33,6 +35,7 @@ export default function QSLForm() {
     })
   };
 
+  // once submitted, check if callsign exists
   const handleSubmit = (e) => {
     if(sender.status !== 'INVALID') {
       setIsSenderLegit(true);
@@ -50,6 +53,7 @@ export default function QSLForm() {
     setSubmitted(true);
   };
 
+  // call API as callsign inputs change
   useEffect(() => {
     setSubmitted(false);
     retrieveInfoByCallsign(inputs.senderCallsign)

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import {BrowserRouter as Router, Route, Link} from "react-router-dom";
+//ideally import data fro
+import {BrowserRouter as Router, Route, Link, useLocation} from "react-router-dom";
+import PropTypes from 'prop-types';
+import QSLForm from './QSLForm.component.jsx';
 
-export default function QSLForm() {
-    return  (
-        <div>
-            QSL Card
-        </div>
-    )
+export default function QSLCard() {
+    <div>
+        Give me data plz
+    </div>
 }
