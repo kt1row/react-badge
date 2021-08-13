@@ -5,7 +5,11 @@ import PropTypes from 'prop-types';
 import QSLForm from './QSLForm.component.jsx';
 
 export default function QSLCard() {
-    <div>
-        Give me data plz
-    </div>
+    return(
+        <div>
+            data
+        </div>
+
+    )
+    
 }

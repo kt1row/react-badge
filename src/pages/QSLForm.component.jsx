@@ -51,6 +51,11 @@ export default function QSLForm() {
     }
     e.preventDefault();
     setSubmitted(true);
+
+    //update (ONLY) final state value w inputs + API data
+    //look at context example ** Grant recommends
+    //https://kentcdodds.com/blog/how-to-use-react-context-effectively
+    //or pass down set method (variable in common parents)
   };
 
   // call API as callsign inputs change
@@ -155,7 +160,7 @@ export default function QSLForm() {
           <div>Frequency: {inputs.frequency} MHz</div>
           <div>Mode: {inputs.mode}</div>
           <div>RS(T): {inputs.rst}</div>
-          <a href="url">Click here to generate a QSL card!</a>
+          <a href="/QSLCard">Click here to generate a QSL card!</a>
         </div> : null
         }
         <div className={styles.error}>
